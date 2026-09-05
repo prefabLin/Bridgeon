@@ -124,6 +124,14 @@ These need answers from someone who runs the events; none of them block P2.
   is a handicap earned? How is an absent team treated? All variants can be
   implemented; the question is which one a ruleset named for the association
   should select by default.
-- **Typical event size.** Team counts and round counts in practice, to set
-  sensible defaults and the shape of generated test tournaments.
+- ~~**Typical event size.**~~ Answered 2026-09-05: events run 2 to 30 tables,
+  occasionally more. The validated limits (60 teams, 30 tables) cover that;
+  raising them is a one-constant change plus rerunning the property tests over
+  the larger range, to be done against a real requirement rather than
+  speculatively.
+- **Even-count counter round robin.** Each team plays two matches per round,
+  but an even field leaves an odd number of opponents, so one round must be an
+  ordinary one. Whether the association ever runs this format with an even
+  count — and how its printed schedule arranges that odd round — decides
+  whether the generator's refusal is already the right behaviour.
 - **A real event to run at P6**, with printed movement cards as the backup.
