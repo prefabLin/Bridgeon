@@ -52,6 +52,12 @@ adopt.
 the test and the implementation are two independent statements checked against
 each other rather than one checking a copy of itself.
 
+## Where to start
+
+`ROADMAP.md` has the scope, the phase plan with its gates, and a "where things
+stand" section naming the next task. `docs/decisions/` records the choices that
+are settled and why, so they do not get relitigated by accident.
+
 ## Layout
 
 | Path | What it is |
@@ -59,12 +65,22 @@ each other rather than one checking a copy of itself.
 | `src/Bridgeon.Core` | Domain: contracts, scoring, rules, ranking. Pure. |
 | `tests/` | Unit and architecture suites. |
 | `tools/` | Development utilities. Not shipped. |
+| `docs/decisions/` | Accepted decisions, one per file. |
+| `ROADMAP.md` | Scope, phases, gates, current state. |
 
 ## Toolchain
 
-`dotnet test` runs everything. `python3 tools/check_provenance.py` checks the
-content rules. `./tools/check_commit_order.sh` checks the TDD gate locally.
-Mutation testing is a merge gate run in CI, not a per-commit tool.
+```bash
+dotnet test                        # unit and architecture suites, a few seconds
+python3 tools/check_provenance.py  # content rules
+./tools/check_commit_order.sh      # the TDD gate, as CI runs it
+```
+
+Mutation testing is a **merge gate, not a commit gate**. Stryker reruns the whole
+suite once per mutant, so it costs minutes in CI and much longer on a small
+machine. It is also why the FsCheck property budget is 200 cases rather than
+2,000: a slow unit suite makes the mutation gate unaffordable, so suite speed is
+a feature rather than a compromise.
 
 ## Limits
 
