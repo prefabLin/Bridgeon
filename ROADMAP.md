@@ -87,9 +87,22 @@ Each gate is machine-checkable, which is what makes unattended work safe.
 ## Where things stand
 
 **P0 is complete.** The repository has its content and TDD gates, the solution
-scaffold, and the Law 78 IMP scale implemented test-first. 32 tests pass.
+scaffold, and the Law 78 IMP scale implemented test-first.
 
-**P1 is next**, in this order:
+**P1 is complete.** Contract notation with typed rejections that never throw
+(wiki/rules/contract-notation.md is its specification); the Law 77 score table,
+all 2,940 cases enumerated against an oracle transcribed from the Law, with
+monotonicity in tricks taken asserted across the whole space; the WBF
+continuous VP scale, asserted against its hand-derived golden-ratio fixed
+points; and the printed 16-board vulnerability cycle. 134 tests pass. The
+mutation gate runs in CI.
+
+**P2 is next**: the schedule engine — the circle-method generator, the
+validator every schedule must pass whatever its origin (decision 0003), the
+counter round robin, and provenance as data. The gate: balance properties hold
+for every team count 2–60.
+
+<details><summary>P1 as it was planned</summary>
 
 1. **Contract notation** — a parser turning what a director types into a
    contract. Typed rejections that name what is wrong; it must never throw,
@@ -101,9 +114,11 @@ scaffold, and the Law 78 IMP scale implemented test-first. 32 tests pass.
 3. **Victory points** — the WBF continuous formula, and the standard
    sixteen-board vulnerability cycle.
 
+</details>
+
 ## Open questions for the director
 
-These need answers from someone who runs the events; none of them block P1.
+These need answers from someone who runs the events; none of them block P2.
 
 - **Ruleset.** Which tiebreak order is in force? Which handicap policy, and how
   is a handicap earned? How is an absent team treated? All variants can be
