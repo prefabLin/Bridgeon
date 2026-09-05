@@ -33,9 +33,8 @@ public sealed class VictoryPointScale
     /// </summary>
     public VictoryPoints For(int netImps)
     {
-        var magnitude = netImps == int.MinValue
-            ? (double)int.MaxValue
-            : Math.Abs((double)netImps);
+        // The cast happens before Math.Abs, so int.MinValue cannot overflow here.
+        var magnitude = Math.Abs((double)netImps);
 
         var winner = magnitude >= _saturationDifference
             ? 20.00m

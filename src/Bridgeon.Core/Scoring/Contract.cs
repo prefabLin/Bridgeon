@@ -19,6 +19,13 @@ public sealed record Contract
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(level, 1);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(level, 7);
+        // A cast-in garbage enum would otherwise score plausibly and wrongly.
+        if (!Enum.IsDefined(strain))
+            throw new ArgumentOutOfRangeException(nameof(strain), strain, "Not a strain.");
+        if (!Enum.IsDefined(doubling))
+            throw new ArgumentOutOfRangeException(nameof(doubling), doubling, "Not a doubling.");
+        if (!Enum.IsDefined(declarer))
+            throw new ArgumentOutOfRangeException(nameof(declarer), declarer, "Not a seat.");
         Level = level;
         Strain = strain;
         Doubling = doubling;

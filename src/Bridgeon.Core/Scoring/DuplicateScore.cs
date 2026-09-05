@@ -16,14 +16,15 @@ public static class DuplicateScore
     public static int For(BoardEntry entry, Vulnerability vulnerability)
     {
         ArgumentNullException.ThrowIfNull(entry);
+        // BoardEntry is a closed hierarchy (private protected constructor), so
+        // these two cases are the whole of it.
         return entry switch
         {
             PassedOut => 0,
             PlayedContract played => played.TricksTaken >= played.Contract.TricksNeeded
                 ? Made(played, vulnerability)
                 : Down(played, vulnerability),
-            _ => throw new ArgumentException(
-                $"Unknown board entry type {entry.GetType().Name}.", nameof(entry)),
+            _ => throw new System.Diagnostics.UnreachableException(),
         };
     }
 

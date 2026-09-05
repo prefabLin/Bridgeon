@@ -7,6 +7,8 @@ namespace Bridgeon.Core.Scoring;
 /// </summary>
 public abstract record BoardEntry
 {
+    private protected BoardEntry() { }
+
     /// <summary>The canonical notation naming this entry.</summary>
     public abstract string Notation { get; }
 }

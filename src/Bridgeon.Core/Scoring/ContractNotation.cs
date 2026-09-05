@@ -133,27 +133,34 @@ public static class ContractNotation
         {
             at++;
             SkipWhitespace(text, ref at);
-            var digits = 0;
+            var value = 0;
             var count = 0;
-            while (at < text.Length && char.IsAsciiDigit(text[at]) && digits <= 13)
+            while (at < text.Length && char.IsAsciiDigit(text[at]))
             {
-                digits = (digits * 10) + (text[at] - '0');
+                // Consume every digit so the message can quote exactly what was
+                // typed; clamp the value so absurd lengths cannot overflow.
+                if (value <= 13) value = (value * 10) + (text[at] - '0');
                 count++;
                 at++;
             }
+            if (count == 0)
+                return Reject(RejectionReason.UnknownResult,
+                    $"'{text[resultStart..].TrimEnd()}' is not a result; expected =, +n or -n.");
             var token = ResultToken(text, resultStart, at);
-            if (count == 0 || digits == 0 || digits > 13)
+            if (value == 0)
                 return Reject(RejectionReason.UnknownResult,
                     $"'{token}' is not a result; expected =, +n or -n.");
-            if (sign == '+' && contract.TricksNeeded + digits > 13)
+            // A too-large count is well-formed notation for an impossible
+            // result, which is its own rejection, not a malformed one.
+            if (sign == '+' && contract.TricksNeeded + value > 13)
                 return Reject(RejectionReason.ImpossibleOvertricks,
                     $"'{token}' would take the trick total past 13.");
-            if (sign == '-' && digits > contract.TricksNeeded)
+            if (sign == '-' && value > contract.TricksNeeded)
                 return Reject(RejectionReason.ImpossibleUndertricks,
                     $"'{token}' is more tricks than the contract needs.");
             tricksTaken = sign == '+'
-                ? contract.TricksNeeded + digits
-                : contract.TricksNeeded - digits;
+                ? contract.TricksNeeded + value
+                : contract.TricksNeeded - value;
         }
         else
         {
