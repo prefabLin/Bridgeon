@@ -1,6 +1,13 @@
 # 0001 — .NET 10, with a pure domain layer
 
-**Status:** accepted
+**Status:** accepted — amended 2026-09-05: the target framework is declared in
+every csproj, not in `Directory.Build.props`. Stryker's project analysis finds
+no projects at all when the framework lives only in the props file (reproduced
+minimally: a fresh classlib + xunit pair works until the framework moves to the
+props file), which silently disabled the mutation gate on every CI run. The
+"one place to edit" guarantee now comes from
+`tests/Bridgeon.Architecture.Tests/TargetFrameworkTests.cs`, which fails if any
+project declares a different framework or the props file declares one.
 
 ## Decision
 
@@ -19,9 +26,10 @@ major-version jump stays a deliberate edit.
 
 ## Consequences
 
-- `Directory.Build.props` is the **only** place the target framework is written.
-  The project templates put a copy in each csproj, and because the props file is
-  imported before the project body those copies win silently.
+- ~~`Directory.Build.props` is the **only** place the target framework is
+  written.~~ Amended, see above: each csproj declares it, and the architecture
+  suite asserts the declarations never diverge and the props file never grows
+  one back.
 - `Bridgeon.Core` carries no package references at all, enforced by
   `tests/Bridgeon.Architecture.Tests`. That is what allows the scoring library to
   be published on its own — the piece another association could adopt without
