@@ -34,6 +34,20 @@ public class ImpScaleTests
         scale.Bands.Select(b => b.Lower).Should().Equal(Law78LowerBounds);
         scale.Bands.Select(b => b.Imp).Should().Equal(Enumerable.Range(0, 25));
         scale.MaxImp.Should().Be(24);
+        // Each band ends one short of the next; only the last is open.
+        scale.Bands.SkipLast(1).Select(b => b.Upper)
+            .Should().Equal(Law78LowerBounds.Skip(1).Select(lower => (int?)(lower - 1)));
+        scale.Bands[^1].Upper.Should().BeNull();
+    }
+
+    [Fact]
+    public void AGapNamesTheBandsOnBothSidesOfIt()
+    {
+        var build = () => ImpScale.FromBands(
+            [new ImpBand(0, 10, 0), new ImpBand(12, null, 1)]);
+
+        build.Should().Throw<ArgumentException>()
+            .WithMessage("*Band 0 ends at 10 but band 1 starts at 12*");
     }
 
     [Fact]
@@ -79,4 +93,11 @@ public class ImpScaleTests
     public void TheMostNegativeDifferenceSaturatesRatherThanOverflowing() =>
         // Math.Abs(int.MinValue) throws, so the magnitude has to be clamped.
         ImpScale.Law78.ImpFor(int.MinValue).Should().Be(24);
+
+    [Fact]
+    public void ANullBandTableIsRejectedByItsParameterName()
+    {
+        var build = () => ImpScale.FromBands(null!);
+        build.Should().Throw<ArgumentNullException>().WithParameterName("bands");
+    }
 }

@@ -134,16 +134,16 @@ public static class ContractNotation
             at++;
             SkipWhitespace(text, ref at);
             var value = 0;
-            var count = 0;
+            var hadDigit = false;
             while (at < text.Length && char.IsAsciiDigit(text[at]))
             {
                 // Consume every digit so the message can quote exactly what was
                 // typed; clamp the value so absurd lengths cannot overflow.
                 if (value <= 13) value = (value * 10) + (text[at] - '0');
-                count++;
+                hadDigit = true;
                 at++;
             }
-            if (count == 0)
+            if (!hadDigit)
                 return Reject(RejectionReason.UnknownResult,
                     $"'{text[resultStart..].TrimEnd()}' is not a result; expected =, +n or -n.");
             var token = ResultToken(text, resultStart, at);

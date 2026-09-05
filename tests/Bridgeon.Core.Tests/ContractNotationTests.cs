@@ -44,12 +44,34 @@ public class ContractNotationTests
     public void CaseAndWhitespaceDoNotMatter(string variant) =>
         Accept(variant).Should().Be(Accept("4S N +1"));
 
+    [Theory]
+    [InlineData("4S X N -1")] // whitespace before the doubling
+    [InlineData("4 S XX N -1", "4SXX N -1")]
+    public void WhitespaceBeforeTheDoublingIsAlsoAllowed(string spaced, string compact = "4SX N -1") =>
+        Accept(spaced).Should().Be(Accept(compact));
+
     [Fact]
     public void NAloneReadsAsNoTrump()
     {
         var played = Accept("4N S =").Should().BeOfType<PlayedContract>().Subject;
         played.Contract.Strain.Should().Be(Strain.NoTrump);
         played.Contract.Declarer.Should().Be(Seat.South);
+    }
+
+    [Fact]
+    public void ALoneNStillTakesItsDoublingFromWhatFollows()
+    {
+        // The X after a lone N is a doubling, never a swallowed T.
+        var played = Accept("4NXX W =").Should().BeOfType<PlayedContract>().Subject;
+        played.Contract.Should().Be(
+            new Contract(4, Strain.NoTrump, Doubling.Redoubled, Seat.West));
+    }
+
+    [Fact]
+    public void ANullContractIsRejectedByItsParameterName()
+    {
+        var construct = () => new PlayedContract(null!, 9);
+        construct.Should().Throw<ArgumentNullException>().WithParameterName("contract");
     }
 
     [Fact]
@@ -94,6 +116,8 @@ public class ContractNotationTests
     [InlineData("7C S +1", RejectionReason.ImpossibleOvertricks)]
     [InlineData("4S N +14", RejectionReason.ImpossibleOvertricks)] // well-formed, merely impossible
     [InlineData("4S N +1000", RejectionReason.ImpossibleOvertricks)]
+    [InlineData("7NT N -131", RejectionReason.ImpossibleUndertricks)] // clamp must not truncate to -13
+    [InlineData("PAS", RejectionReason.UnknownLevel)] // too short to be PASS, and P is no level
     [InlineData("4S N -11", RejectionReason.ImpossibleUndertricks)]
     [InlineData("4S N -14", RejectionReason.ImpossibleUndertricks)]
     [InlineData("1C W -8", RejectionReason.ImpossibleUndertricks)]
@@ -116,6 +140,9 @@ public class ContractNotationTests
         Reject("4S N +1000").Message.Should().Contain("+1000");
         Reject("4S N +x").Message.Should().Contain("+x");
         Reject("4S N -0").Message.Should().Contain("-0");
+        // The quotes hug the offence: no swallowed neighbours, no stray spaces.
+        Reject("4S N +x  ").Message.Should().Contain("'+x'");
+        Reject("4S N +1 junk  ").Message.Should().Contain("'junk'");
     }
 
     [Fact]

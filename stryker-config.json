@@ -3,6 +3,7 @@
     "reporters": ["progress", "html", "json"],
     "thresholds": { "high": 95, "low": 90, "break": 90 },
     "mutation-level": "Advanced",
+    "ignore-mutations": ["string"],
     "additional-timeout": 5000,
     "project-info": { "name": "Bridgeon.Core" }
   }

@@ -180,6 +180,13 @@ public class DuplicateScoreTests
     public void APassedOutBoardScoresZero(Vulnerability vul) =>
         DuplicateScore.For(new PassedOut(), vul).Should().Be(0);
 
+    [Fact]
+    public void ANullEntryIsRejectedByItsParameterName()
+    {
+        var score = () => DuplicateScore.For(null!, Vulnerability.NotVulnerable);
+        score.Should().Throw<ArgumentNullException>().WithParameterName("entry");
+    }
+
     // -------------------------------------------------------------- sign rules
 
     [Fact]
