@@ -1,0 +1,21 @@
+bin/
+obj/
+dist/
+node_modules/
+coverage/
+StrykerOutput/
+reports/
+__pycache__/
+*.pyc
+*.user
+.env
+*.sqlite
+*.sqlite-journal
+
+# Reference values belong in code, not in imported files. See CLAUDE.md.
+*.xls
+*.xlsx
+*.xlsm
+*.bws
+data/
+datasets/
