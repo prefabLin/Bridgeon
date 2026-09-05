@@ -99,7 +99,85 @@ public class ScheduleValidatorTests
         var round = schedule.Rounds[0];
         var corrupted = Replace(schedule, 0, round with { Bye = round.Pairings[0].Home });
 
-        ScheduleValidator.Violations(corrupted).Should().NotBeEmpty();
+        var violations = ScheduleValidator.Violations(corrupted);
+
+        violations.Should().Contain(v => v.Contains("bye team"),
+            "the seated bye is its own offence");
+        violations.Should().Contain(v => v.Contains("neither seated"),
+            "the true sitter-out is unaccounted for");
+    }
+
+    [Fact]
+    public void ADuplicatedRoundIsNamedPairByPair()
+    {
+        // Replace round 2 with a copy of round 1: every round is internally
+        // fine, so only the meeting counts can catch it — pair by pair.
+        var schedule = RoundRobin.Generate(6);
+        var copied = schedule.Rounds[0] with { Number = 2 };
+        var original = schedule.Rounds[1];
+        var corrupted = Replace(schedule, 1, copied);
+
+        var violations = ScheduleValidator.Violations(corrupted);
+
+        foreach (var pairing in schedule.Rounds[0].Pairings)
+            violations.Should().Contain(Meeting(pairing, "twice"),
+                "the copied round doubles its meetings");
+        foreach (var pairing in original.Pairings)
+            violations.Should().Contain(Meeting(pairing, "never"),
+                "the discarded round's meetings are gone");
+    }
+
+    [Fact]
+    public void AHandCraftedDoubleRoundRobinIsValid()
+    {
+        // Three teams, every pair twice, byes landing twice on everyone. The
+        // validator checks the declared contract, not the generator's habits.
+        var schedule = new Schedule(3, 2, 1,
+            [
+                new Round(1, [new Pairing(1, 2)], 3),
+                new Round(2, [new Pairing(1, 3)], 2),
+                new Round(3, [new Pairing(2, 3)], 1),
+                new Round(4, [new Pairing(2, 1)], 3),
+                new Round(5, [new Pairing(3, 1)], 2),
+                new Round(6, [new Pairing(3, 2)], 1),
+            ],
+            ScheduleProvenance.Generated);
+
+        ScheduleValidator.Violations(schedule).Should().BeEmpty();
+    }
+
+    [Fact]
+    public void UnevenByesTripEvenWhenEveryTeamHasByedAtLeastOnce()
+    {
+        // A fourth round hands team 3 a second bye while 1 and 2 keep one
+        // each: the meetings are wrong too, but the bye imbalance must be
+        // named in its own right.
+        var schedule = new Schedule(3, 1, 1,
+            [
+                new Round(1, [new Pairing(1, 2)], 3),
+                new Round(2, [new Pairing(1, 3)], 2),
+                new Round(3, [new Pairing(2, 3)], 1),
+                new Round(4, [new Pairing(1, 2)], 3),
+            ],
+            ScheduleProvenance.Generated);
+
+        ScheduleValidator.Violations(schedule)
+            .Should().Contain(v => v.Contains("Uneven byes") && v.Contains("sits out 2"));
+    }
+
+    [Fact]
+    public void ANullScheduleIsRejectedByItsParameterName()
+    {
+        var validate = () => ScheduleValidator.Violations(null!);
+        validate.Should().Throw<ArgumentNullException>().WithParameterName("schedule");
+    }
+
+    private static string Meeting(Pairing pairing, string times)
+    {
+        var (low, high) = pairing.Home < pairing.Away
+            ? (pairing.Home, pairing.Away)
+            : (pairing.Away, pairing.Home);
+        return $"Teams {low} and {high} meet {times} but must meet once.";
     }
 
     [Fact]
@@ -122,8 +200,9 @@ public class ScheduleValidatorTests
         });
 
         ScheduleValidator.Violations(corrupted)
-            .Should().Contain(v => v.Contains("bye"),
-                "byes must land on every team equally");
+            .Should().Contain(v => v.Contains("bye") && v.Contains("sits out 2"),
+                "byes must land on every team equally, and the message names "
+                + "the team with the most");
     }
 
     private static Schedule Replace(Schedule schedule, int index, Round round)
