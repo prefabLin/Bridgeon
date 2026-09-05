@@ -58,6 +58,11 @@ each other rather than one checking a copy of itself.
 stand" section naming the next task. `docs/decisions/` records the choices that
 are settled and why, so they do not get relitigated by accident.
 
+**The wiki is the specification.** Read the relevant `wiki/rules/` page before
+answering any question about a bridge rule, and update it in the same commit
+that changes the behaviour it describes. `wiki/log.md` is an append-only work
+log. See `docs/decisions/0004`.
+
 ## Layout
 
 | Path | What it is |
@@ -66,6 +71,8 @@ are settled and why, so they do not get relitigated by accident.
 | `tests/` | Unit and architecture suites. |
 | `tools/` | Development utilities. Not shipped. |
 | `docs/decisions/` | Accepted decisions, one per file. |
+| `wiki/` | The specification: rule pages with citations, append-only log. |
+| `design/` | UI design files. The contract for frontend work (decision 0005). |
 | `ROADMAP.md` | Scope, phases, gates, current state. |
 
 ## Toolchain

@@ -62,6 +62,14 @@ a score, and crash recovery that is just replay.
 **One SQLite file per event.** A file the director can email, archive, or hand
 over when something goes wrong.
 
+**The wiki is the specification.** Rule pages in `wiki/rules/` restate the
+published source each behaviour implements and move in the same commit as the
+behaviour; `wiki/log.md` records the work append-only (decision 0004).
+
+**UI comes from design files.** Screens are designed in `design/` before they
+are implemented, following the workflows directors already know (decision
+0005). P4 and P5 each begin with their screens designed, not with code.
+
 ## Phases
 
 Each gate is machine-checkable, which is what makes unattended work safe.
@@ -72,8 +80,8 @@ Each gate is machine-checkable, which is what makes unattended work safe.
 | **P1** | Scoring core: contract notation, Law 77 table, VP | the 2,940-case score space enumerated; mutation ≥90% |
 | **P2** | Schedule engine: generator, validator, provenance | balance properties hold for every team count 2–60 |
 | **P3** | Event log, HTTP API, MCP server | killed mid-event, replays to identical state, 100 runs |
-| **P4** | Director console | a full event driven end to end by Playwright, offline |
-| **P5** | Table clients | event scored from simulated phones, network dropped mid-round |
+| **P4** | Director console, from design files | a full event driven end to end by Playwright, offline |
+| **P5** | Table clients, from design files | event scored from simulated phones, network dropped mid-round |
 | **P6** | First real event | results accepted; USEBIO validates against the published XSD |
 
 ## Where things stand
