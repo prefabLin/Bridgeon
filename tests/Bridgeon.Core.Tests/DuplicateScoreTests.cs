@@ -148,6 +148,11 @@ public class DuplicateScoreTests
     [InlineData("4SX N =", Vulnerability.Vulnerable, 790)]
     [InlineData("1CXX N =", Vulnerability.NotVulnerable, 230)]
     [InlineData("3NTX N +1", Vulnerability.Vulnerable, 950)]
+    // Backstops for the overtrick values the oracle shares with the
+    // implementation: doubled not-vulnerable, and redoubled both ways.
+    [InlineData("3HX N +2", Vulnerability.NotVulnerable, 730)]
+    [InlineData("2SXX N +2", Vulnerability.NotVulnerable, 1040)]
+    [InlineData("1NTXX N +1", Vulnerability.Vulnerable, 1160)]
     // Slams.
     [InlineData("6C N =", Vulnerability.NotVulnerable, 920)]
     [InlineData("6NT N =", Vulnerability.Vulnerable, 1440)]

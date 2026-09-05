@@ -37,8 +37,10 @@ public class VictoryPointsTests
     {
         var vp = SixteenBoards.For(netImps);
 
-        vp.Own.Should().Be(decimal.Parse(own));
-        vp.Opponents.Should().Be(decimal.Parse(opponents));
+        // Invariant culture: on a comma-decimal locale "15.00" must not read as 1500.
+        vp.Own.Should().Be(decimal.Parse(own, System.Globalization.CultureInfo.InvariantCulture));
+        vp.Opponents.Should().Be(
+            decimal.Parse(opponents, System.Globalization.CultureInfo.InvariantCulture));
     }
 
     [Fact]

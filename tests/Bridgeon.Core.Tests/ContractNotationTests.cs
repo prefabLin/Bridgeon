@@ -92,7 +92,10 @@ public class ContractNotationTests
     [InlineData("4S N ~1", RejectionReason.UnknownResult)]
     [InlineData("4S N +4", RejectionReason.ImpossibleOvertricks)]
     [InlineData("7C S +1", RejectionReason.ImpossibleOvertricks)]
+    [InlineData("4S N +14", RejectionReason.ImpossibleOvertricks)] // well-formed, merely impossible
+    [InlineData("4S N +1000", RejectionReason.ImpossibleOvertricks)]
     [InlineData("4S N -11", RejectionReason.ImpossibleUndertricks)]
+    [InlineData("4S N -14", RejectionReason.ImpossibleUndertricks)]
     [InlineData("1C W -8", RejectionReason.ImpossibleUndertricks)]
     [InlineData("4S N +1 junk", RejectionReason.UnexpectedTrailingInput)]
     [InlineData("PASS junk", RejectionReason.UnexpectedTrailingInput)]
@@ -109,6 +112,10 @@ public class ContractNotationTests
     {
         Reject("4Q N =").Message.Should().Contain("Q");
         Reject("4S N +9").Message.Should().Contain("+9");
+        // Exactly what was typed — never a truncation of it.
+        Reject("4S N +1000").Message.Should().Contain("+1000");
+        Reject("4S N +x").Message.Should().Contain("+x");
+        Reject("4S N -0").Message.Should().Contain("-0");
     }
 
     [Fact]
@@ -171,6 +178,19 @@ public class ContractNotationTests
         var contract = new Contract(4, Strain.Spades, Doubling.None, Seat.North);
         var construct = () => new PlayedContract(contract, tricks);
         construct.Should().Throw<ArgumentOutOfRangeException>();
+    }
+
+    [Fact]
+    public void AnUndefinedEnumArgumentIsAProgrammingError()
+    {
+        // A cast-in garbage enum must throw, not score plausibly and wrongly.
+        var strain = () => new Contract(4, (Strain)99, Doubling.None, Seat.North);
+        var doubling = () => new Contract(4, Strain.Spades, (Doubling)7, Seat.North);
+        var seat = () => new Contract(4, Strain.Spades, Doubling.None, (Seat)9);
+
+        strain.Should().Throw<ArgumentOutOfRangeException>();
+        doubling.Should().Throw<ArgumentOutOfRangeException>();
+        seat.Should().Throw<ArgumentOutOfRangeException>();
     }
 
     [Fact]
