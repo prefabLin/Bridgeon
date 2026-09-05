@@ -41,3 +41,30 @@ page first caught two of my own errors before they reached code — a doubling
 written on the wrong side of the seat, and a mis-remembered 3NTX+1 value.
 
 Next: P2 — the schedule engine.
+
+## 2026-09-05 — the mutation gate repaired, and a review round
+
+Two findings from running the gates for real rather than trusting them:
+
+- **The mutation gate had never actually run.** Stryker's project analysis
+  finds zero source projects when the TargetFramework lives only in
+  Directory.Build.props — reproduced minimally with a fresh classlib pair.
+  Every CI run had failed at that step since the first push. Fixed by declaring
+  the framework in each csproj, with two architecture tests replacing the
+  "one place to edit" guarantee (decision 0001, amended).
+- **An independent review agent audited the P1 diff** and returned seven
+  confirmed findings, all now fixed test-first: culture-sensitive
+  decimal.Parse in the VP tests, parser rejections that violated their own
+  wiki page (+14 must be an impossible overtrick, messages must quote exactly
+  what was typed), an int overflow in the vulnerability cycle, missing enum
+  guards on Contract, a dead int.MinValue branch, an open BoardEntry
+  hierarchy, and thin fixed-point coverage for shared overtrick values.
+
+First honest mutation score: 88.32. After killing the genuine survivors and
+configuring string-literal mutants out (message wording is cosmetic; the
+reason enums and quoted fragments are asserted): **97.57**, with only provably
+equivalent boundary mutants surviving. 154 tests.
+
+Process note: the review agent caught real defects the enumeration missed —
+the whole-space oracle shares blind spots with the implementation it checks.
+Keep the pattern: an independent review pass after every phase.
