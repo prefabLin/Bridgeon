@@ -1,0 +1,7 @@
+# Traditional Chinese phrases Bridgeon uses in its own interface.
+# Every CJK string in the repository must appear here.
+#
+# Add a phrase when you write it for Bridgeon. Do not add one to make a check
+# pass over text that came from somewhere else.
+#
+# (empty: no Chinese interface text yet)
